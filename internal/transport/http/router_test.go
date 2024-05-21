@@ -90,3 +90,29 @@ func TestServer_NewRouter(t *testing.T) {
 		})
 	}
 }
+
+func Test_writeResponse(t *testing.T) {
+	type args struct {
+		status int
+		body   interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "",
+			args: args{
+				status: http.StatusOK,
+				body:   map[string]interface{}{"message": make(chan int)},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			writeResponse(w, tt.args.status, tt.args.body)
+			assert.NotEqualValues(t, "", w.Body.String())
+		})
+	}
+}

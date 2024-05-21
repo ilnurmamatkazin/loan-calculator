@@ -119,18 +119,21 @@ const ContextKeyConfig ContextKey = "config"
 func TestStorage_new(t *testing.T) {
 	tests := []struct {
 		name string
+		cfg  *config.Config
 	}{
 		{
-			name: "Testing new storage",
+			name: "Positive: проверяем наличие конфигурации",
+			cfg:  &config.Config{App: config.App{CountMapItems: 1024}},
+		},
+		{
+			name: "Negative: проверяем отсутсвие конфигурации",
+			cfg:  nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg := &config.Config{}
-			cfg.App.CountMapItems = 1024
-
 			st := &Storage{}
-			ctx := context.WithValue(context.Background(), ContextKeyConfig, cfg)
+			ctx := context.WithValue(context.Background(), ContextKeyConfig, tt.cfg)
 
 			st.new(ctx)
 

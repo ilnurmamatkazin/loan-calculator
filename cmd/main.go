@@ -11,7 +11,6 @@ import (
 	"syscall"
 	"time"
 
-	"loan-calculator/internal/storage/maps"
 	"loan-calculator/internal/transport/http"
 	"loan-calculator/pkg/config"
 )
@@ -27,11 +26,12 @@ func main() {
 	// Помещаем объект конфигурации в контекст
 	ctx = initConfig(ctx)
 
-	// Инициализируем хранилище
-	stor := maps.Init(ctx)
-
 	// Инициализируем http сервер
-	httpServer := http.Init(ctx, stor)
+	httpServer, err := http.Init(ctx)
+	if err != nil {
+		slog.Error(err.Error())
+		return
+	}
 
 	// Ловим сигнал завершения работы сервиса
 	chSignal := make(chan os.Signal, 2)
@@ -51,7 +51,9 @@ func main() {
 			cancel()
 
 			// Завершаем работу http сервера
-			httpServer.CloseGracefully(ctx)
+			if err := httpServer.Server.Shutdown(ctx); err != nil {
+				slog.Error("HTTP shutdown", "error", err)
+			}
 
 			isContinue = false
 

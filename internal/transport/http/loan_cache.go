@@ -11,5 +11,7 @@ func (s *Server) cache(w http.ResponseWriter, _ *http.Request) error {
 		return errorStatus{error: ErrEmptyCache, status: http.StatusBadRequest}
 	}
 
-	return writeResponse(w, http.StatusOK, list)
+	writeResponse(w, http.StatusOK, list)
+
+	return nil
 }

@@ -44,9 +44,7 @@ func handlerFuncWithError(f func(http.ResponseWriter, *http.Request) error) http
 				Error: err.Error(),
 			}
 
-			if err = writeResponse(w, status, e); err != nil {
-				slog.Error(err.Error())
-			}
+			writeResponse(w, status, e)
 		}
 	}
 }
@@ -87,13 +85,12 @@ func mwRequestStatistic(next http.Handler) http.Handler {
 }
 
 // Функция по формированию ответа клиенту.
-func writeResponse(w http.ResponseWriter, status int, body interface{}) error {
+func writeResponse(w http.ResponseWriter, status int, body interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 
 	if err := json.NewEncoder(w).Encode(body); err != nil {
-		return errorStatus{error: err, status: http.StatusInternalServerError}
+		slog.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-
-	return nil
 }

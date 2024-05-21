@@ -15,10 +15,13 @@ import (
 // Так как изначально, ничего не сказано про размер хранилища,
 // то для уменьшения аллокаций памяти, инициализируем мапу определенной емкости.
 func (st *Storage) new(ctx context.Context) {
-	countMapItems := 1024
+	var countMapItems int
 
 	// Получаем размер хранилища из конфигурационного файла
-	if cfg, ok := ctx.Value(config.ContextKeyConfig).(*config.Config); ok {
+	cfg, ok := ctx.Value(config.ContextKeyConfig).(*config.Config)
+	if !ok || cfg.App.CountMapItems < 1 {
+		countMapItems = 1024
+	} else {
 		countMapItems = cfg.App.CountMapItems
 	}
 

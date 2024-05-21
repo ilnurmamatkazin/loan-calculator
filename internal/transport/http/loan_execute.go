@@ -15,7 +15,7 @@ func (s *Server) execute(w http.ResponseWriter, r *http.Request) (err error) {
 	}
 	defer func() {
 		if errDefer := r.Body.Close(); errDefer != nil {
-			err = errorStatus{error: errDefer, status: http.StatusBadRequest}
+			err = errorStatus{error: errDefer, status: http.StatusInternalServerError}
 			return
 		}
 	}()
@@ -24,7 +24,9 @@ func (s *Server) execute(w http.ResponseWriter, r *http.Request) (err error) {
 		return errorStatus{error: err, status: status}
 	}
 
-	return writeResponse(w, http.StatusOK, s.stor.Execute(body))
+	writeResponse(w, http.StatusOK, s.stor.Execute(body))
+
+	return nil
 }
 
 func validateExecute(body model.LoanNew) (int, error) {

@@ -21,9 +21,17 @@ func TestStorage_Cache(t *testing.T) {
 		{
 			name: "Тестируем функцию cache",
 			fields: fields{
-				m: make(map[int]model.Loan),
+				m: map[int]model.Loan{
+					3: {ID: 3},
+					2: {ID: 2},
+					1: {ID: 1},
+				},
 			},
-			want: make([]model.Loan, 0),
+			want: []model.Loan{
+				{ID: 1},
+				{ID: 2},
+				{ID: 3},
+			},
 		},
 	}
 	for _, tt := range tests {

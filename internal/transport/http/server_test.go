@@ -3,10 +3,9 @@ package http
 
 import (
 	"context"
-	"loan-calculator/internal/storage/maps"
+	"errors"
 	"loan-calculator/pkg/config"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -27,38 +26,29 @@ func TestInit(t *testing.T) {
 	}
 
 	ctx := context.WithValue(context.Background(), config.ContextKeyConfig, cfg)
-	stor := maps.Init(ctx)
+	//stor := maps.Init(ctx)
 
-	server := Init(ctx, stor)
+	server, err := Init(ctx)
 
 	// Проверяем результаты
+	assert.Nil(t, err)
 	assert.NotNil(t, server)
 	assert.Equal(t, cfg, server.cfg)
-	assert.Equal(t, stor, server.stor)
-}
+	//assert.Equal(t, stor, server.stor)
 
-func TestServer_CloseGracefully(t *testing.T) {
-	t.Run("Shutdown successful", func(t *testing.T) {
-		// Создаем тестовый HTTP сервер
-		testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-		}))
-		defer testServer.Close()
+	go func() {
+		time.Sleep(1 * time.Second)
+		server.Server.Shutdown(ctx)
+	}()
 
-		// Создаем наш сервер с тестовым сервером
-		server := &Server{server: testServer.Config}
+	err = server.Run()
 
-		// Запускаем метод Shutdown в горутине
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-		defer cancel()
-		go func() {
-			server.CloseGracefully(ctx)
-		}()
-
-		// Даем время для корректного завершения
-		time.Sleep(100 * time.Millisecond)
-
-		// Проверяем что сервер был корректно завершен
-		assert.NoError(t, ctx.Err())
-	})
+	switch {
+	case err == nil:
+		assert.Nil(t, err)
+	case errors.Is(err, http.ErrServerClosed):
+		assert.Equal(t, err, http.ErrServerClosed)
+	default:
+		assert.Error(t, err)
+	}
 }

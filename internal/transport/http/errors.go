@@ -25,4 +25,7 @@ var (
 
 	// ErrEmptyCache - пустой кеш.
 	ErrEmptyCache = errors.New("empty cache")
+
+	// ErrConfig - ошибка получения конфигурации системы.
+	ErrConfig = errors.New("ошибка получения конфигурации системы")
 )
