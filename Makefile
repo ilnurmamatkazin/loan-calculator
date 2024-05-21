@@ -21,7 +21,7 @@ lint-fast: .install-linter
 
 .PHONY: run
 run:
-	go run ./cmd/main.go
+	go run ./cmd/main.go -config=./cmd/config.yml
 
 .PHONY: test-run
 test-run:

@@ -3,6 +3,7 @@ package config
 
 import (
 	"errors"
+	"flag"
 	"log/slog"
 	"os"
 	"sync"
@@ -11,9 +12,9 @@ import (
 )
 
 var (
-	configPath = "./cmd/config.yml"
-	once       sync.Once
-	cfg        *Config
+	conf = flag.String("config", "./config.yml", "Path to configuration file")
+	once sync.Once
+	cfg  *Config
 )
 
 // ContextKeyConfig - переменная необходима для чтения/записи в контекст.
@@ -27,7 +28,9 @@ func New() (*Config, error) {
 	)
 
 	once.Do(func() {
-		if yamlFile, err = os.ReadFile(configPath); err != nil {
+		flag.Parse()
+
+		if yamlFile, err = os.ReadFile(*conf); err != nil {
 			return
 		}
 

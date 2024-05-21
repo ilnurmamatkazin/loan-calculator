@@ -51,6 +51,7 @@ func handlerFuncWithError(f func(http.ResponseWriter, *http.Request) error) http
 	}
 }
 
+// Мидлваре по обработке паники в хендлерах.
 func mwPanicRecovery(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		defer func() {
@@ -64,6 +65,7 @@ func mwPanicRecovery(next http.Handler) http.Handler {
 	})
 }
 
+// Мидлваре расчета статистики.
 func mwRequestStatistic(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		start := time.Now()
@@ -84,9 +86,11 @@ func mwRequestStatistic(next http.Handler) http.Handler {
 	})
 }
 
+// Функция по формированию ответа клиенту.
 func writeResponse(w http.ResponseWriter, status int, body interface{}) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
+
 	if err := json.NewEncoder(w).Encode(body); err != nil {
 		return errorStatus{error: err, status: http.StatusInternalServerError}
 	}

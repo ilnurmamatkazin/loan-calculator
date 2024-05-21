@@ -20,6 +20,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	// Настраиваем логер, что бы данные отдавались в формате json
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 
@@ -88,6 +89,7 @@ func initConfig(ctx context.Context) context.Context {
 	conf, err := config.New()
 	if err != nil {
 		slog.Error("Чтение конфигурации", "error", err)
+		os.Exit(1)
 	}
 
 	// Записываем конфигурацию в контекст
